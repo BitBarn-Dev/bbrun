@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QAction
-from PySide2.QtGui import QKeySequence
+from PyQt5.QtWidgets import QAction
+from PyQt5.QtGui import QKeySequence
 import os
 import platform
 import subprocess
@@ -10,15 +10,15 @@ class MenuManager:
 
     def create_menu_bar(self):
         menubar = self.window.menuBar()
-        
+
         # File Menu
         file_menu = menubar.addMenu('&File')
         self.create_file_menu(file_menu)
-        
+
         # Edit Menu
         edit_menu = menubar.addMenu('&Edit')
         self.create_edit_menu(edit_menu)
-        
+
         # Run Menu
         run_menu = menubar.addMenu('&Run')
         self.create_run_menu(run_menu)
@@ -34,7 +34,7 @@ class MenuManager:
             (None, None, None),
             ('&Exit', QKeySequence.Quit, self.window.close)
         ]
-        
+
         self.add_actions(menu, actions)
 
     def create_edit_menu(self, menu):
@@ -48,7 +48,7 @@ class MenuManager:
             ('&Run', 'F5', self.window.tab_manager.run_code),
             ('Run with &Sudo', 'F6', self.window.tab_manager.run_code_with_sudo)
         ]
-        
+
         self.add_actions(menu, actions)
 
     def add_actions(self, menu, actions):
@@ -65,7 +65,7 @@ class MenuManager:
     def open_scripts_folder(self):
         """Open the scripts folder in the system's default file explorer"""
         scripts_path = str(self.window.script_manager.scripts_dir)
-        
+
         if platform.system() == 'Windows':
             os.startfile(scripts_path)
         elif platform.system() == 'Darwin':  # macOS

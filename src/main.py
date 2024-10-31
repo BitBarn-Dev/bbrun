@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication  # Change from PySide2 to PyQt5
 from views.main_window import PythonExecutor
 
 def main():

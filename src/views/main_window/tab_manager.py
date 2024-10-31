@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import (QTabWidget, QMessageBox, QInputDialog, 
-                              QLineEdit)
+from PyQt5.QtWidgets import (QTabWidget, QMessageBox, QInputDialog,
+                             QLineEdit)
 from ..editor import CodeEditorTab
 from ..editor.custom_tabbar import CustomTabBar
 from ..dialogs import SaveScriptDialog, LoadScriptDialog
@@ -22,10 +22,10 @@ class TabManager:
         self.tab_widget.tabCloseRequested.connect(self.close_tab)
         self.tab_widget.currentChanged.connect(self.on_tab_changed)
         self.tab_widget.tabBar().tabMoved.connect(self.on_tab_moved)
-        
+
         # Add this line to connect to the textChanged signal when tabs change
         self.tab_widget.currentChanged.connect(self.setup_text_changed_handler)
-        
+
         self.window.main_layout.addWidget(self.tab_widget)
 
     def setup_text_changed_handler(self, index):
@@ -46,24 +46,23 @@ class TabManager:
         """Handle text changes in the editor"""
         if self._ignore_text_changed:  # Skip if we're loading content
             return
-            
+
         index = self.tab_widget.indexOf(tab)
         if index >= 0:
             self.update_tab_unsaved_status(index)
-
 
     def update_tab_unsaved_status(self, index):
         """Update the visual status of a tab to show unsaved changes"""
         tab = self.tab_widget.widget(index)
         current_text = self.get_clean_tab_name(index)
         has_changes = tab.get_unsaved_changes()
-        
+
         print(f"Debug - Tab status update:")  # Debug logging
         print(f"  Current text: {current_text}")
         print(f"  Has changes: {has_changes}")
         print(f"  Current content: {tab.editor.toPlainText()[:50]}...")
         print(f"  Last saved content: {tab.last_saved_content[:50]}...")
-        
+
         if has_changes:
             if not current_text.endswith(self._unsaved_marker):
                 self.tab_widget.setTabText(index, current_text + self._unsaved_marker)
@@ -81,12 +80,12 @@ class TabManager:
         """Save the tab's content and metadata"""
         if not tab.filepath:
             return False
-            
+
         content = tab.editor.toPlainText()
         metadata = tab.metadata
         metadata['display_name'] = self.get_clean_tab_name(self.tab_widget.indexOf(tab))
         metadata['last_modified'] = datetime.datetime.now().isoformat()
-        
+
         try:
             self.window.script_manager.save_script(tab.filepath, content, metadata)
             tab.last_saved_content = content  # Update the saved content reference
@@ -109,7 +108,7 @@ class TabManager:
         current_tab = self.tab_widget.currentWidget()
         if not current_tab:
             return
-            
+
         if not current_tab.filepath:
             # No existing file - redirect to Save As
             self.save_as()
@@ -133,12 +132,12 @@ class TabManager:
             return
 
         current_metadata = current_tab.metadata if hasattr(current_tab, 'metadata') else {}
-        
+
         while True:  # Loop until we get a valid save or user cancels
             dialog = SaveScriptDialog(self.window.script_manager, current_metadata, self.window)
             if dialog.exec_():
                 metadata = dialog.get_metadata()
-                
+
                 # Check if script already exists
                 if self.window.script_manager.script_exists(metadata['name'], metadata['category']):
                     reply = QMessageBox.question(
@@ -148,7 +147,7 @@ class TabManager:
                         "Do you want to choose a different name?",
                         QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel
                     )
-                    
+
                     if reply == QMessageBox.Cancel:
                         return
                     elif reply == QMessageBox.Yes:
@@ -169,7 +168,7 @@ class TabManager:
                         else:
                             QMessageBox.warning(self.window, "Save Error", "Failed to save file")
                         return
-                
+
                 # Save new script
                 content = current_tab.editor.toPlainText()
                 filepath = self.window.script_manager.save_script(
@@ -177,7 +176,7 @@ class TabManager:
                     content,
                     metadata
                 )
-                
+
                 if filepath:
                     current_tab.filepath = filepath
                     current_tab.metadata = metadata
@@ -202,7 +201,7 @@ class TabManager:
             result = dialog.get_selected_script()
             if result:
                 filepath, version = result
-                
+
                 # Check if already open
                 for i in range(self.tab_widget.count()):
                     tab = self.tab_widget.widget(i)
@@ -226,7 +225,7 @@ class TabManager:
     def close_tab(self, index):
         """Handle tab close request"""
         tab = self.tab_widget.widget(index)
-        
+
         if tab.get_unsaved_changes():
             reply = QMessageBox.question(
                 self.window,
@@ -234,7 +233,7 @@ class TabManager:
                 "This tab has unsaved changes. Do you want to save before closing?",
                 QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
             )
-            
+
             if reply == QMessageBox.Save:
                 if tab.filepath:
                     if not self.save_tab(tab):
@@ -291,7 +290,7 @@ class TabManager:
                 self.window, 'Sudo Password',
                 'Enter your sudo password:',
                 QLineEdit.Password)
-                
+
             if ok:
                 code = current_tab.editor.toPlainText()
                 current_tab.output_window.clear()
@@ -312,6 +311,6 @@ class TabManager:
     def on_tab_moved(self, from_index, to_index):
         """Handle tab reordering"""
         self.window.status_bar.showMessage(
-            f"Tab moved from position {from_index + 1} to {to_index + 1}", 
+            f"Tab moved from position {from_index + 1} to {to_index + 1}",
             2000
         )

@@ -1,7 +1,7 @@
-from PySide2.QtCore import QSettings
+import os
 import json
 from pathlib import Path
-import os
+from PyQt5.QtCore import QSettings  # Change from PySide2 to PyQt5
 
 class SessionManager:
     def __init__(self, window=None):
@@ -17,12 +17,12 @@ class SessionManager:
         """
         session_data = []
         valid_files = []
-        
+
         for i in range(tab_widget.count()):
             tab = tab_widget.widget(i)
             # Get the clean tab name without the unsaved marker
             display_name = tab.display_name  # Use the clean display name from the tab
-                
+
             tab_data = {
                 'filepath': tab.filepath,
                 'content': tab.editor.toPlainText(),
@@ -31,16 +31,16 @@ class SessionManager:
                 'display_name': display_name
             }
             session_data.append(tab_data)
-            
+
             # Track valid files for settings
             if tab.filepath and os.path.isfile(tab.filepath):
                 valid_files.append(tab.filepath)
-        
+
         try:
             # Save detailed session data
             with open(self.session_file, 'w') as f:
                 json.dump(session_data, f, indent=2)
-            
+
             # Save file list to settings
             self.settings.setValue('open_files', valid_files)
         except Exception as e:
@@ -55,27 +55,27 @@ class SessionManager:
             # Try to load from settings as fallback
             files = self.settings.value('open_files', [])
             if files:
-                return [{'filepath': f, 'content': '', 'metadata': {}, 
-                        'is_saved': True, 'display_name': os.path.basename(f)} 
+                return [{'filepath': f, 'content': '', 'metadata': {},
+                        'is_saved': True, 'display_name': os.path.basename(f)}
                        for f in files if f and os.path.isfile(f)]
             return None
-            
+
         try:
             with open(self.session_file, 'r') as f:
                 session_data = json.load(f)
-                
+
                 # Validate and clean the session data
                 valid_data = []
                 for tab_data in session_data:
                     filepath = tab_data.get('filepath')
                     if filepath is None or (filepath and os.path.isfile(filepath)):
                         valid_data.append(tab_data)
-                
+
                 # Update settings with valid files
-                valid_files = [tab['filepath'] for tab in valid_data 
+                valid_files = [tab['filepath'] for tab in valid_data
                              if tab['filepath'] and os.path.isfile(tab['filepath'])]
                 self.settings.setValue('open_files', valid_files)
-                
+
                 return valid_data
         except Exception as e:
             print(f"Error loading session: {e}")
@@ -86,8 +86,8 @@ class SessionManager:
         """Load session from settings if json file fails"""
         files = self.settings.value('open_files', [])
         if files:
-            return [{'filepath': f, 'content': '', 'metadata': {}, 
-                    'is_saved': True, 'display_name': os.path.basename(f)} 
+            return [{'filepath': f, 'content': '', 'metadata': {},
+                    'is_saved': True, 'display_name': os.path.basename(f)}
                    for f in files if f and os.path.isfile(f)]
         return None
 

@@ -1,8 +1,8 @@
-from PySide2.QtWidgets import QWidget, QVBoxLayout, QSplitter
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QTextCursor
 import os
 import json
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSplitter
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QTextCursor
 from .code_editor import CodeEditor
 from .output_window import OutputWindow
 
@@ -21,7 +21,7 @@ class CodeEditorTab(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        
+
         splitter = QSplitter(Qt.Vertical)
         splitter.setHandleWidth(1)
         splitter.setStyleSheet("""
@@ -33,14 +33,14 @@ class CodeEditorTab(QWidget):
                 border: none;
             }
         """)
-        
+
         self.editor = CodeEditor()
         self.output_window = OutputWindow()
-        
+
         splitter.addWidget(self.editor)
         splitter.addWidget(self.output_window)
         splitter.setSizes([700, 300])
-        
+
         layout.addWidget(splitter)
 
     def load_content(self):
@@ -63,16 +63,16 @@ class CodeEditorTab(QWidget):
         """Save the content and update the last saved state"""
         if not self.filepath:
             return False
-            
+
         try:
             data = {
                 'content': self.editor.toPlainText(),
                 'metadata': self.metadata
             }
-            
+
             with open(self.filepath, 'w', encoding='utf-8') as file:
                 json.dump(data, file, indent=2)
-                
+
             self.last_saved_content = self.editor.toPlainText()
             return True
         except Exception as e:
@@ -83,13 +83,13 @@ class CodeEditorTab(QWidget):
         """Check if there are unsaved changes in the editor"""
         current_content = self.editor.toPlainText()
         result = current_content != self.last_saved_content
-        
+
         print(f"Debug - Checking unsaved changes:")  # Debug logging
         print(f"  Has filepath: {bool(self.filepath)}")
         print(f"  Current content length: {len(current_content)}")
         print(f"  Last saved content length: {len(self.last_saved_content)}")
         print(f"  Content matches: {not result}")
-        
+
         return result
 
     def get_content(self):
@@ -136,7 +136,7 @@ class CodeEditorTab(QWidget):
         """Move cursor to specified line number"""
         if line_number < 1:
             return
-            
+
         cursor = self.editor.textCursor()
         cursor.movePosition(QTextCursor.Start)
         cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, line_number - 1)

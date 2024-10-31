@@ -1,7 +1,6 @@
-# views/main_window/dialogs.py
-from PySide2.QtWidgets import (QDialog, QFormLayout, QLineEdit, 
-                              QDialogButtonBox, QInputDialog, QMessageBox)
-from PySide2.QtCore import Qt
+from PyQt5.QtWidgets import (QDialog, QFormLayout, QLineEdit,
+                             QDialogButtonBox, QInputDialog, QMessageBox)
+from PyQt5.QtCore import Qt
 import datetime
 
 class TabNameDialog(QDialog):
@@ -12,11 +11,11 @@ class TabNameDialog(QDialog):
 
     def setup_ui(self, current_name):
         layout = QFormLayout(self)
-        
+
         self.name_input = QLineEdit(current_name, self)
         self.name_input.setMinimumWidth(250)
         layout.addRow("Tab Name:", self.name_input)
-        
+
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             Qt.Horizontal, self)

@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QTabBar, QInputDialog
-from PySide2.QtCore import Qt
+from PyQt5.QtWidgets import QTabBar, QInputDialog
+from PyQt5.QtCore import Qt
 
 class CustomTabBar(QTabBar):
     def __init__(self, parent=None):
@@ -7,7 +7,7 @@ class CustomTabBar(QTabBar):
         self.setMovable(True)  # Enable tab reordering
         self.setTabsClosable(True)  # Enable close buttons
         self.setElideMode(Qt.ElideRight)  # Show ... when text is too long
-        
+
     def mouseDoubleClickEvent(self, event):
         # Get the tab index at the mouse position
         index = self.tabAt(event.pos())

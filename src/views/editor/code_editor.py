@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QPlainTextEdit, QTextEdit
-from PySide2.QtCore import Qt, QRect
-from PySide2.QtGui import QFont, QTextFormat, QColor, QPainter
+from PyQt5.QtWidgets import QPlainTextEdit, QTextEdit
+from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtGui import QFont, QTextFormat, QColor, QPainter
 from .auto_complete import AutoCompleteEdit
 from .line_numbers import LineNumberArea
 from .syntax import PythonSyntaxHighlighter
@@ -13,17 +13,17 @@ class CodeEditor(AutoCompleteEdit):
     def setup_editor(self):
         self.setFont(QFont("Consolas", 11))
         self.setup_color_scheme()
-        
+
         self.setTabStopWidth(self.fontMetrics().horizontalAdvance(' ') * 4)
-        
+
         self.line_number_area = LineNumberArea(self)
-        
+
         self.highlighter = PythonSyntaxHighlighter(self.document())
-        
+
         self.blockCountChanged.connect(self.update_line_number_area_width)
         self.updateRequest.connect(self.update_line_number_area)
         self.cursorPositionChanged.connect(self.highlight_current_line)
-        
+
         self.update_line_number_area_width(0)
 
     def setup_color_scheme(self):
@@ -57,8 +57,8 @@ class CodeEditor(AutoCompleteEdit):
         super().resizeEvent(event)
         cr = self.contentsRect()
         self.line_number_area.setGeometry(QRect(cr.left(), cr.top(),
-                                              self.line_number_area_width(),
-                                              cr.height()))
+                                                self.line_number_area_width(),
+                                                cr.height()))
 
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
@@ -75,8 +75,8 @@ class CodeEditor(AutoCompleteEdit):
                 number = str(block_number + 1)
                 painter.setPen(QColor("#858585"))
                 painter.drawText(0, top, self.line_number_area.width() - 5,
-                               self.fontMetrics().height(), Qt.AlignRight, number)
-            
+                                 self.fontMetrics().height(), Qt.AlignRight, number)
+
             block = block.next()
             top = bottom
             bottom = top + self.blockBoundingRect(block).height()

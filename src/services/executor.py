@@ -1,5 +1,5 @@
 import os
-from PySide2.QtCore import QProcess
+from PyQt5.QtCore import QProcess  # Change from PySide2 to PyQt5
 
 class ScriptExecutor:
     @staticmethod
@@ -9,7 +9,7 @@ class ScriptExecutor:
             temp_file.write(code)
 
         process = QProcess()
-        
+
         if sudo and password:
             sudo_command = f"echo {password} | sudo -S python3 {temp_filename}"
             process.start("bash", ["-c", sudo_command])

@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QTextEdit
-from PySide2.QtGui import QFont
+from PyQt5.QtWidgets import QTextEdit
+from PyQt5.QtGui import QFont
 
 class OutputWindow(QTextEdit):
     def __init__(self):

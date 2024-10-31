@@ -1,5 +1,5 @@
-from PySide2.QtCore import QRegularExpression
-from PySide2.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont
+from PyQt5.QtCore import QRegularExpression
+from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont
 
 class PythonSyntaxHighlighter(QSyntaxHighlighter):
     def __init__(self, document):
