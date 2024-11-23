@@ -1,12 +1,31 @@
 #!/bin/bash
 
-# Save the current working directory
-CURRENT_DIR=$PWD
-VENV_DIR="venv"
+# Load paths from config.ini
+CONFIG_FILE="$HOME/.python_executor/config.ini"
+
+# Function to load config values
+load_config() {
+    if [[ -f "$CONFIG_FILE" ]]; then
+        VENV_PATH=$(grep -oP '(?<=^VENV_PATH=).*' "$CONFIG_FILE")
+        SOURCE_PATH=$(grep -oP '(?<=^SOURCE_PATH=).*' "$CONFIG_FILE")
+    else
+        echo "Config file not found at $CONFIG_FILE"
+        exit 1
+    fi
+}
+
+# Load configuration
+load_config
+
+# Define the base directory for execution (current working directory)
+EXECUTION_BASE="$(pwd)"
+
+# Path to the bbrun requirements file
+BBRUN_REQUIREMENTS="$HOME/skulley/bbrun/requirements.txt"
 
 # Function to display help information
 display_help() {
-    echo "Usage: ./bbrun.sh [options]"
+    echo "Usage: bbrun [options]"
     echo ""
     echo "Options:"
     echo "  -h, --help        Show this help message and exit."
@@ -14,40 +33,31 @@ display_help() {
     echo "  -d                Run the Python application in detached mode."
     echo ""
     echo "This script manages a Python virtual environment and runs a Python application."
-    echo "It will create a virtual environment if it does not exist, install the required"
-    echo "packages listed in requirements.txt, and then execute the application."
-    echo ""
     echo "If the -d option is provided, the script will run the application in the background"
     echo "and log output to bbrun.log."
     echo ""
-    echo "If the -rebuild option is specified, any existing virtual environment will be removed"
-    echo "and a new one will be created, ensuring that you start with a clean environment."
-    echo ""
-    echo "Examples:"
-    echo "  ./bbrun.sh              # Run the application with the existing virtual environment."
-    echo "  ./bbrun.sh -rebuild     # Rebuild the virtual environment and run the application."
-    echo "  ./bbrun.sh -d           # Run the application in detached mode."
-    echo "  ./bbrun.sh -rebuild -d  # Rebuild and run the application in detached mode."
 }
 
 # Function to create or rebuild the virtual environment
 setup_virtualenv() {
-    if [[ -d "$VENV_DIR" ]]; then
+    if [[ -d "$VENV_PATH" ]]; then
         echo "Virtual environment already exists."
         if [[ "$1" == "-rebuild" ]]; then
             echo "Rebuilding the virtual environment..."
-            rm -rf "$VENV_DIR"
+            rm -rf "$VENV_PATH"
         else
             echo "Using existing virtual environment."
             return
         fi
     fi
 
-    echo "Creating virtual environment..."
-    python3 -m venv "$VENV_DIR"
-    source "$VENV_DIR/bin/activate"
+    echo "Creating virtual environment in $VENV_PATH..."
+    python3 -m venv "$VENV_PATH"
+    source "$VENV_PATH/bin/activate"
     pip install --upgrade pip  # Upgrade pip in the new environment
-    pip install -r requirements.txt
+
+    # Use the bbrun requirements file
+    pip install -r "$BBRUN_REQUIREMENTS"
 }
 
 # Check for options
@@ -66,20 +76,20 @@ fi
 # Check for the -d flag (run detached)
 if [[ "$2" == "-d" ]]; then
     # Activate the virtual environment
-    source "$VENV_DIR/bin/activate"
+    source "$VENV_PATH/bin/activate"
 
     # Run the Python application in the background (detached) and redirect output to log
-    (cd "$CURRENT_DIR" && nohup python3 src/main.py > bbrun.log 2>&1 &)
+    (cd "$EXECUTION_BASE" && nohup python3 "$SOURCE_PATH" > "$EXECUTION_BASE/bbrun.log" 2>&1 &)
 
     echo "Running in detached mode. Output is redirected to bbrun.log."
 
     # No need to deactivate here, as we are in a subshell
 else
     # Activate the virtual environment
-    source "$VENV_DIR/bin/activate"
+    source "$VENV_PATH/bin/activate"
 
     # Run the Python application in the terminal (foreground)
-    (cd "$CURRENT_DIR" && python3 src/main.py)
+    (cd "$EXECUTION_BASE" && python3 "$SOURCE_PATH")
 
     # Deactivate the virtual environment when done
     deactivate

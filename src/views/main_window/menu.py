@@ -3,6 +3,7 @@ from PyQt5.QtGui import QKeySequence
 import os
 import platform
 import subprocess
+from .pip_dialogs import RequirementsEditor, PipExecutorDialog
 
 class MenuManager:
     def __init__(self, window):
@@ -22,6 +23,10 @@ class MenuManager:
         # Run Menu
         run_menu = menubar.addMenu('&Run')
         self.create_run_menu(run_menu)
+
+        # Pip Menu
+        pip_menu = menubar.addMenu('&Pip')
+        self.create_pip_menu(pip_menu)
 
     def create_file_menu(self, menu):
         actions = [
@@ -50,6 +55,25 @@ class MenuManager:
         ]
 
         self.add_actions(menu, actions)
+
+    def create_pip_menu(self, menu):
+        # Requirements editor action
+        req_action = QAction('Edit Requirements...', self.window)
+        req_action.triggered.connect(self.show_requirements_editor)
+        menu.addAction(req_action)
+
+        # Pip executor action
+        pip_action = QAction('Pip Command...', self.window)
+        pip_action.triggered.connect(self.show_pip_executor)
+        menu.addAction(pip_action)
+
+    def show_requirements_editor(self):
+        dialog = RequirementsEditor(self.window)
+        dialog.exec_()
+
+    def show_pip_executor(self):
+        dialog = PipExecutorDialog(self.window)
+        dialog.exec_()
 
     def add_actions(self, menu, actions):
         for name, shortcut, handler in actions:
