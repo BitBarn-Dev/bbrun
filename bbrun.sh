@@ -52,12 +52,25 @@ setup_virtualenv() {
     fi
 
     echo "Creating virtual environment in $VENV_PATH..."
-    python3 -m venv "$VENV_PATH"
-    source "$VENV_PATH/bin/activate"
-    pip install --upgrade pip  # Upgrade pip in the new environment
+    python3.10 -m venv "$VENV_PATH" || {
+        echo "Error creating virtual environment. Ensure Python 3.10 is installed."
+        exit 1
+    }
 
-    # Use the bbrun requirements file
-    pip install -r "$BBRUN_REQUIREMENTS"
+    echo "Activating virtual environment..."
+    source "$VENV_PATH/bin/activate"
+
+    echo "Upgrading pip..."
+    pip install --upgrade pip --break-system-packages || {
+        echo "Error upgrading pip. Ensure PEP 668 restrictions are addressed."
+        exit 1
+    }
+
+    echo "Installing requirements..."
+    pip install -r "$BBRUN_REQUIREMENTS" --break-system-packages || {
+        echo "Error installing requirements. Check your $BBRUN_REQUIREMENTS file."
+        exit 1
+    }
 }
 
 # Check for options
@@ -79,7 +92,7 @@ if [[ "$2" == "-d" ]]; then
     source "$VENV_PATH/bin/activate"
 
     # Run the Python application in the background (detached) and redirect output to log
-    (cd "$EXECUTION_BASE" && nohup python3 "$SOURCE_PATH" > "$EXECUTION_BASE/bbrun.log" 2>&1 &)
+    (cd "$EXECUTION_BASE" && nohup python3.10 "$SOURCE_PATH" > "$EXECUTION_BASE/bbrun.log" 2>&1 &)
 
     echo "Running in detached mode. Output is redirected to bbrun.log."
 
@@ -89,7 +102,7 @@ else
     source "$VENV_PATH/bin/activate"
 
     # Run the Python application in the terminal (foreground)
-    (cd "$EXECUTION_BASE" && python3 "$SOURCE_PATH")
+    (cd "$EXECUTION_BASE" && python3.10 "$SOURCE_PATH")
 
     # Deactivate the virtual environment when done
     deactivate
